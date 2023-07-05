@@ -86,6 +86,7 @@ def Draw_Window():
     pygame.display.update()
 
 def Colision(p1,p2):
+    #https://physics.stackexchange.com/questions/599278/how-can-i-calculate-the-final-velocities-of-two-spheres-after-an-elastic-collisi
     n=[p1.Position[d]-p2.Position[d] for d in range(2)]
     aux=0
     for d in range(2): aux+=n[d]*(p2.Velocity[d]-p1.Velocity[d])
