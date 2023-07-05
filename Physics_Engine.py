@@ -17,6 +17,9 @@ World='Closed'
 screen=pygame.display.set_mode(window_size)
 pygame.display.set_caption('2D Physics Engine')
 
+def Force(p):
+    return [0,800]
+
 class Particle():
     def __init__(self, position, velocity, mass, radius):
         self.Position=position
@@ -24,11 +27,17 @@ class Particle():
         self.M=mass
         self.R=radius
     def Move(self):
-        X, Y = self.Position
-        Vx, Vy = self.Velocity
+        F=Force(self)
+        for d in range(2):
+            self.Velocity[d]+=0.5*F[d]*dt/self.M
+        for d in range(2):
+            self.Position[d]+=self.Velocity[d]*dt
+        F=Force(self)
+        for d in range(2):
+            self.Velocity[d]+=0.5*F[d]*dt/self.M
         
-        X+=Vx*dt
-        Y+=Vy*dt
+        X, Y= self.Position
+        Vx, Vy= self.Velocity
         
         
         if World=='Closed':
@@ -57,8 +66,8 @@ class Particle():
                 Y=Height
         
         
-        self.Position=(X,Y)
-        self.Velocity=(Vx, Vy)
+        self.Position=[X,Y]
+        self.Velocity=[Vx, Vy]
         
         
         
@@ -72,7 +81,7 @@ def Draw_Window(t):
     pygame.display.update()
 
 t=0
-System=[Particle((uniform(0,250),uniform(0,250)),(uniform(0,180),uniform(0,180)),10,10) for i in range(10)]
+System=[Particle([uniform(0,250),uniform(0,250)],[uniform(-50,50),uniform(-10,10)],10,10) for i in range(5)]
 while True:
     start=time.process_time()
     for event in pygame.event.get():
