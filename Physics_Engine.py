@@ -3,10 +3,10 @@ environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 import pygame
 import sys
-import time
 from random import uniform
 from math import sqrt
 from itertools import combinations
+from numpy.random import choice
 
 
 
@@ -18,19 +18,21 @@ window_size=(Width,Height)
 World='Closed'
 screen=pygame.display.set_mode(window_size)
 pygame.display.set_caption('2D Physics Engine')
+clock = pygame.time.Clock()
 
 def Distance(p1, p2):
     return sqrt((p1.Position[0]-p2.Position[0])**2+(p1.Position[1]-p2.Position[1])**2)
 
 def Force(p):
-    return [0,2000]
+    return [0,2500]
 
 class Particle():
-    def __init__(self, position, velocity, mass, radius):
+    def __init__(self, position, velocity, mass=10, radius=10, color='White'):
         self.Position=position
         self.Velocity= velocity
         self.M=mass
         self.R=radius
+        self.Color=color
     def Move(self):
         F=Force(self)
         for d in range(2):
@@ -81,12 +83,23 @@ def Draw_Window():
     
     screen.fill('white')
     for p in System:
-        pygame.draw.circle(screen, 'blue', p.Position, p.R)
+        pygame.draw.circle(screen, p.Color, p.Position, p.R)
     
     pygame.display.update()
 
 def Colision(p1,p2):
     #https://physics.stackexchange.com/questions/599278/how-can-i-calculate-the-final-velocities-of-two-spheres-after-an-elastic-collisi
+    
+    
+    aux=[p1.Position[d]-p2.Position[d] for d in range(2)]
+    norm=Distance(Particle(aux,aux),Particle([0,0],aux))
+    n_norm=[aux[d]/norm for d in range(2)]
+    Delta=(p1.R+p2.R-norm)
+    
+    p1.Position=[p1.Position[d] + n_norm[d]*Delta*p2.M/(p1.M+p2.M) for d in range(2)]
+    p2.Position=[p2.Position[d] - n_norm[d]*Delta*p1.M/(p1.M+p2.M) for d in range(2)]
+    
+    
     n=[p1.Position[d]-p2.Position[d] for d in range(2)]
     aux=0
     for d in range(2): aux+=n[d]*(p2.Velocity[d]-p1.Velocity[d])
@@ -107,13 +120,12 @@ def Next_Step():
 
 
 if __name__ == "__main__":
-    System=[Particle([uniform(0,250),uniform(0,250)],[uniform(-50,50),uniform(-10,10)],10,10) for i in range(20)]
+    
+    System=[Particle([uniform(0,500),uniform(0,500)],[uniform(-25,25),uniform(-25,25)],10,10,'blue') for i in range(10)]
     while True:
-        start=time.process_time()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
         Next_Step()
-        finish=time.process_time()
-        if (finish-start<dt): time.sleep(dt-(finish-start))
+        dt = clock.tick(80)/1000
     
