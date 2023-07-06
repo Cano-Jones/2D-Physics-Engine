@@ -16,6 +16,7 @@ Width=500
 Height=500
 window_size=(Width,Height)
 World='Closed'
+Force_Type='None'
 screen=pygame.display.set_mode(window_size)
 pygame.display.set_caption('2D Physics Engine')
 clock = pygame.time.Clock()
@@ -24,7 +25,8 @@ def Distance(p1, p2):
     return sqrt((p1.Position[0]-p2.Position[0])**2+(p1.Position[1]-p2.Position[1])**2)
 
 def Force(p):
-    return [0,2500]
+    if Force_Type=='None':    return [0,0]
+    if Force_Type=='FreeFall': return [0,1000*p.M]
 
 class Particle():
     def __init__(self, position, velocity, mass=10, radius=10, color='White'):
@@ -93,20 +95,23 @@ def Colision(p1,p2):
     
     aux=[p1.Position[d]-p2.Position[d] for d in range(2)]
     norm=Distance(Particle(aux,aux),Particle([0,0],aux))
-    n_norm=[aux[d]/norm for d in range(2)]
-    Delta=(p1.R+p2.R-norm)
+    if norm!=0:
+        n_norm=[aux[d]/norm for d in range(2)]
+        Delta=(p1.R+p2.R-norm)
     
-    p1.Position=[p1.Position[d] + n_norm[d]*Delta*p2.M/(p1.M+p2.M) for d in range(2)]
-    p2.Position=[p2.Position[d] - n_norm[d]*Delta*p1.M/(p1.M+p2.M) for d in range(2)]
+        p1.Position=[p1.Position[d] + n_norm[d]*Delta*p2.M/(p1.M+p2.M) for d in range(2)]
+        p2.Position=[p2.Position[d] - n_norm[d]*Delta*p1.M/(p1.M+p2.M) for d in range(2)]
     
     
     n=[p1.Position[d]-p2.Position[d] for d in range(2)]
-    aux=0
-    for d in range(2): aux+=n[d]*(p2.Velocity[d]-p1.Velocity[d])
-    c=2.0*aux/((n[0]**2+n[1]**2)*(1.0/p1.M+1.0/p2.M))
+    norm=Distance(Particle(n,n),Particle([0,0],n))
+    if norm!=0:
+        aux=0
+        for d in range(2): aux+=n[d]*(p2.Velocity[d]-p1.Velocity[d])
+        c=2.0*aux/((n[0]**2+n[1]**2)*(1.0/p1.M+1.0/p2.M))
     
-    p1.Velocity=[p1.Velocity[d]+c/p1.M*n[d] for d in range(2)]
-    p2.Velocity=[p2.Velocity[d]-c/p2.M*n[d] for d in range(2)]
+        p1.Velocity=[p1.Velocity[d]+c/p1.M*n[d] for d in range(2)]
+        p2.Velocity=[p2.Velocity[d]-c/p2.M*n[d] for d in range(2)]
 
 def Next_Step():
     for p in System:
@@ -120,8 +125,10 @@ def Next_Step():
 
 
 if __name__ == "__main__":
-    
-    System=[Particle([uniform(0,500),uniform(0,500)],[uniform(-25,25),uniform(-25,25)],10,10,'blue') for i in range(10)]
+    System=[]
+    System=[Particle([uniform(0,Width),uniform(0,Height)],[uniform(-200,200),uniform(-200,200)],2,2,'blue') for i in range(500)]
+    System.append(Particle([Width*2/3,Height/2],[0,0],30,30,'red'))
+    System.append(Particle([Width/3,Height/2],[0,0],15,15,'green'))
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
