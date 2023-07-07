@@ -4,7 +4,7 @@ environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import pygame
 import sys
 from random import uniform
-from math import sqrt
+from math import sqrt, atan
 from itertools import combinations
 from numpy.random import choice
 
@@ -16,7 +16,7 @@ Width=500
 Height=500
 window_size=(Width,Height)
 World='Closed'
-Force_Type='None'
+Force_Type='FreeFall'
 screen=pygame.display.set_mode(window_size)
 pygame.display.set_caption('2D Physics Engine')
 clock = pygame.time.Clock()
@@ -73,17 +73,31 @@ class Particle():
                 Y=0
             if Y<0:
                 Y=Height
+        if World=='Circle':
+            if (X-Width/2)**2+(Y-Height/2)**2>(min(Height,Width)/2-self.R)**2:
+                pass
         
         
         self.Position=[X,Y]
         self.Velocity=[Vx, Vy]
         
+
+class Line():
+    def __init__(self, First_Point, Second_Point, Color):
+        self.A=First_Point
+        self.B=Second_Point
+        self.Color=Color
+        self.Angle= atan((self.A[1]-self.B[1])/(self.A[0]-self.B[0]))
+        self.Len=sqrt((self.A[0]-self.B[0])**2+(self.A[1]-self.B[1])**2)
         
         
 
 def Draw_Window():
     
     screen.fill('white')
+    if World=='Circle':
+        screen.fill('gray')
+        pygame.draw.circle(screen, 'white', [Width/2,Height/2], min(Height,Width)/2)
     for p in System:
         pygame.draw.circle(screen, p.Color, p.Position, p.R)
     
@@ -126,9 +140,9 @@ def Next_Step():
 
 if __name__ == "__main__":
     System=[]
-    System=[Particle([uniform(0,Width),uniform(0,Height)],[uniform(-200,200),uniform(-200,200)],2,2,'blue') for i in range(500)]
-    System.append(Particle([Width*2/3,Height/2],[0,0],30,30,'red'))
-    System.append(Particle([Width/3,Height/2],[0,0],15,15,'green'))
+    #System=[Particle([uniform(0,Width),uniform(0,Height)],[uniform(-200,200),uniform(-200,200)],2,2,'blue') for i in range(500)]
+    System.append(Particle([Width*2/3,Height/2],[-45,20],30,30,'red'))
+    System.append(Particle([Width/3,Height/2],[60,-40],15,15,'green'))
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
