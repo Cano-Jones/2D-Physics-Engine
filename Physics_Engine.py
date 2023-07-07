@@ -4,18 +4,18 @@ environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import pygame
 import sys
 from random import uniform
-from math import sqrt, atan
-from itertools import combinations
+from math import sqrt, atan2, cos, sin, pi
+from itertools import combinations, permutations
 from numpy.random import choice
 
 
 
 
 dt=0.01
-Width=500
-Height=500
+Width=600
+Height=600
 window_size=(Width,Height)
-World='Closed'
+World='Circle'
 Force_Type='FreeFall'
 screen=pygame.display.set_mode(window_size)
 pygame.display.set_caption('2D Physics Engine')
@@ -26,7 +26,7 @@ def Distance(p1, p2):
 
 def Force(p):
     if Force_Type=='None':    return [0,0]
-    if Force_Type=='FreeFall': return [0,1000*p.M]
+    if Force_Type=='FreeFall': return [0,500*p.M]
 
 class Particle():
     def __init__(self, position, velocity, mass=10, radius=10, color='White'):
@@ -74,36 +74,42 @@ class Particle():
             if Y<0:
                 Y=Height
         if World=='Circle':
-            if (X-Width/2)**2+(Y-Height/2)**2>(min(Height,Width)/2-self.R)**2:
-                pass
-        
-        
+            if (X-Width/2)**2+(Y-Height/2)**2>=(min(Height,Width)/2-self.R)**2:
+                Angle=atan2(Y-Height/2,X-Width/2)+pi/2
+                X=Width/2+(min(Height,Width)/2-self.R)*cos(Angle-pi/2)
+                Y=Height/2+(min(Height,Width)/2-self.R)*sin(Angle-pi/2)
+                aux_x=Vx
+                aux_y=Vy
+                Vx=cos(2*Angle)*aux_x+aux_y*sin(2*Angle)
+                Vy=sin(2*Angle)*aux_x-aux_y*cos(2*Angle)
+                
+                
+                
         self.Position=[X,Y]
         self.Velocity=[Vx, Vy]
-        
-
-class Line():
-    def __init__(self, First_Point, Second_Point, Color):
-        self.A=First_Point
-        self.B=Second_Point
-        self.Color=Color
-        self.Angle= atan((self.A[1]-self.B[1])/(self.A[0]-self.B[0]))
-        self.Len=sqrt((self.A[0]-self.B[0])**2+(self.A[1]-self.B[1])**2)
         
         
 
 def Draw_Window():
     
     screen.fill('white')
+    if World=='Closed':
+        pygame.draw.line(screen,'gray',[0,0],[Width,0], width=7)
+        pygame.draw.line(screen,'gray',[Width,0], [Width, Height], width=7)
+        pygame.draw.line(screen,'gray',[0,0],[0,Height], width=7)
+        pygame.draw.line(screen,'gray',[0,Height], [Width,Height], width=7)
     if World=='Circle':
         screen.fill('gray')
         pygame.draw.circle(screen, 'white', [Width/2,Height/2], min(Height,Width)/2)
+        pygame.draw.circle(screen, 'black', [Width/2,Height/2], min(Height,Width)/2, width=2)
     for p in System:
         pygame.draw.circle(screen, p.Color, p.Position, p.R)
     
     pygame.display.update()
+    
+    
 
-def Colision(p1,p2):
+def Particle_Particle_Colision(p1,p2):
     #https://physics.stackexchange.com/questions/599278/how-can-i-calculate-the-final-velocities-of-two-spheres-after-an-elastic-collisi
     
     
@@ -133,16 +139,19 @@ def Next_Step():
     
     for comb in combinations(System, 2):
         if Distance(comb[0], comb[1])<(comb[0].R+comb[1].R):
-            Colision(comb[0],comb[1])
+            Particle_Particle_Colision(comb[0],comb[1])
+    
+    
     Draw_Window()
 
 
 
 if __name__ == "__main__":
     System=[]
-    #System=[Particle([uniform(0,Width),uniform(0,Height)],[uniform(-200,200),uniform(-200,200)],2,2,'blue') for i in range(500)]
-    System.append(Particle([Width*2/3,Height/2],[-45,20],30,30,'red'))
-    System.append(Particle([Width/3,Height/2],[60,-40],15,15,'green'))
+    System=[Particle([uniform(Width*1/3,Width*2/3),uniform(Height/3,Height*2/3)],[uniform(-200,200),uniform(-200,200)],5,10,'skyblue3') for i in range(5)]
+    System.append(Particle([Width*2/3,Height/2], [0,0], 20,30,'red'))
+    System.append(Particle([Width*1/3,Height/2], [0,0], 10,20,'green'))
+    System.append(Particle([Width/2,Height/2], [0,0], 20,25,'blue'))
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
