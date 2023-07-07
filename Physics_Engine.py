@@ -22,11 +22,26 @@ pygame.display.set_caption('2D Physics Engine')
 clock = pygame.time.Clock()
 
 def Distance(p1, p2):
+    if World=='Periodic':
+        #Distances are different here
+        pass
     return sqrt((p1.Position[0]-p2.Position[0])**2+(p1.Position[1]-p2.Position[1])**2)
+
 
 def Force(p):
     if Force_Type=='None':    return [0,0]
     if Force_Type=='FreeFall': return [0,500*p.M]
+    if Force_Type=='Coulomb':
+        # If World== Periodic, this has to change
+        G=50
+        F=[0,0]
+        for q in System:
+            if q is not p:
+                cte=G*p.M*q.M
+                R=Distance(p,q)
+                F[0]-=cte/R/R*(p.Position[0]-q.Position[0])
+                F[1]-=cte/R/R*(p.Position[1]-q.Position[1])
+        return F
 
 class Particle():
     def __init__(self, position, velocity, mass=10, radius=10, color='White'):
@@ -102,6 +117,7 @@ def Draw_Window():
         screen.fill('gray')
         pygame.draw.circle(screen, 'white', [Width/2,Height/2], min(Height,Width)/2)
         pygame.draw.circle(screen, 'black', [Width/2,Height/2], min(Height,Width)/2, width=2)
+        
     for p in System:
         pygame.draw.circle(screen, p.Color, p.Position, p.R)
     
@@ -148,10 +164,10 @@ def Next_Step():
 
 if __name__ == "__main__":
     System=[]
-    System=[Particle([uniform(Width*1/3,Width*2/3),uniform(Height/3,Height*2/3)],[uniform(-200,200),uniform(-200,200)],5,10,'skyblue3') for i in range(5)]
-    System.append(Particle([Width*2/3,Height/2], [0,0], 20,30,'red'))
-    System.append(Particle([Width*1/3,Height/2], [0,0], 10,20,'green'))
-    System.append(Particle([Width/2,Height/2], [0,0], 20,25,'blue'))
+    #System=[Particle([uniform(Width*1/3,Width*2/3),uniform(Height/3,Height*2/3)],[uniform(-10,10),uniform(-10,10)],2,3,'skyblue3') for i in range(200)]
+    System.append(Particle([Width*2/3, Height/2], [0,0], 30, 30, 'red'))
+    System.append(Particle([Width/2,Height/2], [0,0], 20, 20, 'green'))
+    System.append(Particle([Width/3,Height/2], [0,0], 15, 15, 'blue'))
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
