@@ -1,10 +1,11 @@
-from numpy import array, remainder
+from numpy import array, remainder, dot, sign
 from numpy.linalg import norm
-from math import atan2, cos, sin, pi
+from math import sqrt, atan2, cos, sin, pi
 from pygame import draw, display, time, event, QUIT
 from sys import exit
 from itertools import combinations
 from numpy import random
+from time import sleep
 
 
 def Closed_Box_Boundary(particle,):
@@ -22,11 +23,16 @@ def Closed_Box_Boundary(particle,):
         particle.Position[1] = particle.Radius
         particle.Velocity[1] = -particle.Velocity[1]
 
+
+
 def Periodic_Boundary(particle):
     
     particle.Position=remainder(particle.Position, array(BoxSize))
     
+    
+    
 def Closed_Circle_Boundary(particle):
+    
     Width, Height =BoxSize
     [X,Y]=particle.Position
     [Vx,Vy]=particle.Velocity
@@ -37,13 +43,42 @@ def Closed_Circle_Boundary(particle):
         particle.Velocity[0]=cos(2*Angle)*Vx+Vy*sin(2*Angle)
         particle.Velocity[1]=sin(2*Angle)*Vx-Vy*cos(2*Angle)
 
+
+
 def Circle_Boundary_Background():
+    
     screen.fill('gray')
     Center=[BoxSize[d]/2 for d in range(2)]
     draw.circle(screen, 'white', Center, min(Center))
         
+        
+        
 def Particle_Particle_Distance(p1,p2):
+    
     return norm(p1.Position-p2.Position)
+
+
+def Particle_Line_Distance(particle, line):
+    
+    if line.Point_A[0] == line.Point_B[0]:
+        if particle.Position[1]<max(line.Point_A[1], line.Point_B[1]) and particle.Position[1]>min(line.Point_A[1], line.Point_B[1]):
+            return abs(particle.Position[0]-line.Point_A[0])
+        
+    elif line.Point_A[1] == line.Point_B[1]:
+        if particle.Position[0]<max(line.Point_A[0], line.Point_B[0]) and particle.Position[0]>min(line.Point_A[0], line.Point_B[0]):
+            return abs(particle.Position[1]-line.Point_A[1])
+    
+    
+    if particle.Position[0]<max(line.Point_A[0], line.Point_B[0]) and particle.Position[0]>min(line.Point_A[0], line.Point_B[0]):
+        if particle.Position[1]<max(line.Point_A[1], line.Point_B[1]) and particle.Position[1]>min(line.Point_A[1], line.Point_B[1]):
+            
+            aux1 = (line.Point_B[0]-line.Point_A[0])*(line.Point_A[1]-particle.Position[1])
+            aux2 = (line.Point_B[1]-line.Point_A[1])*(line.Point_A[0]-particle.Position[0])
+            return abs(aux1-aux2)/line.Length
+        
+    return max(BoxSize)
+
+
 
 def Particle_Particle_Collision(p1,p2):
     #https://physics.stackexchange.com/questions/599278/how-can-i-calculate-the-final-velocities-of-two-spheres-after-an-elastic-collisi
@@ -66,19 +101,42 @@ def Particle_Particle_Collision(p1,p2):
         p1.Velocity=p1.Velocity + vec*c/p1.Mass
         p2.Velocity=p2.Velocity - vec*c/p2.Mass
 
-def Coulomb_Force(p):
-    G=100000
-    aux=[0,0]
-    for q in Particle_System:
-        if q is not p:
-            cte=G*p.Charge*q.Charge
-            R=Particle_Particle_Distance(p,q)
-            aux[0]-=cte/R/R/R*(p.Position[0]-q.Position[0])
-            aux[1]-=cte/R/R/R*(p.Position[1]-q.Position[1])
-    return aux
 
-def Dummy_Function(): 
-    pass
+def Particle_Line_Collision(particle, line):
+    
+    if line.Point_A[0] == line.Point_B[0]:
+        particle.Position[0]=line.Point_A[0] + sign(particle.Position[0]-line.Point_A[0])*particle.Radius
+        particle.Velocity[0]=-particle.Velocity[0]
+        
+    elif line.Point_A[1] == line.Point_B[1]:
+        particle.Position[1]=line.Point_A[1] + sign(particle.Position[1]-line.Point_A[1])*particle.Radius
+        particle.Velocity[1]=-particle.Velocity[1]
+    
+    else:
+        v=line.Point_B-line.Point_A
+        u=line.Point_A-particle.Position
+                
+        T=-dot(v,u)/dot(v,v)
+        P=(1-T)*line.Point_A+T*line.Point_B
+        n=(particle.Position-P)/norm(particle.Position-P)
+        particle.Position=P+n*particle.Radius
+        
+        Angle=line.Angle
+        Vx,Vy=particle.Velocity
+        aux_x=Vx
+        aux_y=Vy
+        Vx=cos(2*Angle)*aux_x+aux_y*sin(2*Angle)
+        Vy=sin(2*Angle)*aux_x-aux_y*cos(2*Angle)
+        particle.Velocity=array([Vx,Vy])
+        
+
+
+
+
+
+def Dummy_Function(): pass
+
+
 
 def Pygame_Start(WindowSize):
     global BoxSize
@@ -91,13 +149,12 @@ def Pygame_Start(WindowSize):
 
 
 
-def Engine(Window_Size: list = [600,600], System: list = [], Background: 'function' = Dummy_Function, 
-           Boundary: 'function' = lambda self: None, Force: 'function' = lambda self: [0,0]):
-    global Particle_System
-    Particle_System=System
+def Engine(Window_Size: list = [600,600], Particle_System: list = [], Line_System: list = [],
+           Background: 'function' = Dummy_Function, Boundary: 'function' = lambda self: None, Force: 'function' = lambda self: [0,0]):
+    
     
     Pygame_Start(Window_Size)
-    for particle in System:
+    for particle in Particle_System:
         particle.Boundary=Boundary
         particle.Force=Force
         
@@ -106,23 +163,33 @@ def Engine(Window_Size: list = [600,600], System: list = [], Background: 'functi
         for py_event in event.get():
             if py_event.type == QUIT:
                 exit()
-        Draw_Window(system=System, Background=Background)
-        for particle in System:
+        Draw_Window(Particle_System=Particle_System, Background=Background, Line_System=Line_System)
+        for particle in Particle_System:
             particle.Move(dt)
-        for comb in combinations(System,2):
+        for comb in combinations(Particle_System,2):
             if Particle_Particle_Distance(comb[0], comb[1]) < comb[0].Radius+comb[1].Radius:
                 Particle_Particle_Collision(comb[0], comb[1])
+        for particle in Particle_System:
+            for line in Line_System:
+                #print(Particle_Line_Distance(particle=particle, line=line))
+                if Particle_Line_Distance(particle=particle, line=line) < particle.Radius:
+                    Particle_Line_Collision(particle=particle, line=line)
         dt = clock.tick(100)/1000
 
-def Draw_Window(system: list =[], Background: 'function' = Dummy_Function):
+
+
+def Draw_Window(Particle_System: list =[], Line_System: list = [], Background: 'function' = Dummy_Function):
+    
     screen.fill('white')
     Background()
-    for p in system:
+    for line in Line_System:
+        draw.line(screen, 'black', line.Point_A, line.Point_B, width=5)
+    for p in Particle_System:
         draw.circle(screen, p.Color, p.Position, p.Radius)
     display.update()
     
-def Random_Color():
-    return tuple(random.random(size=3) * 256)
+    
+    
+def Random_Color():     return tuple(random.random(size=3) * 256)
 
-__all__ = ['Engine', 'Closed_Box_Boundary', 'Periodic_Boundary', 'Closed_Circle_Boundary', 'Circle_Boundary_Background', 'Particle_Particle_Distance', 
-           'Coulomb_Force', 'Random_Color']
+__all__ = ['Engine', 'Closed_Box_Boundary', 'Periodic_Boundary', 'Closed_Circle_Boundary', 'Circle_Boundary_Background', 'Particle_Particle_Distance', 'Random_Color']

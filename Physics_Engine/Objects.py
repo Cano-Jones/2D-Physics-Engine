@@ -1,7 +1,10 @@
 from numpy import array
+from numpy.linalg import norm
+from math import atan2
 
 
 class Particle():
+    
     def __init__(self, Position: list = [0,0], Velocity: list = [0,0], Mass: float = 10, Radius: float = 10,
                  Charge: float = 1, Color: str = 'black'):
         
@@ -21,8 +24,16 @@ class Particle():
         self.Velocity=self.Velocity+0.5*array(self.Force(self))/self.Mass*TimeStep
         
         self.Boundary(self)
+
+class Line():
+    def __init__(self, Point_A: list = [0,0], Point_B: list = [0,0]):
+        self.Point_A=array(Point_A)
+        self.Point_B=array(Point_B)
+        self.Length=norm(self.Point_A-self.Point_B)
+        self.Angle=atan2(Point_A[1]-Point_B[1], Point_A[0]-Point_B[0])
         
-__all__ = ['Particle']
+        
+__all__ = ['Particle', 'Line']
         
 
 
