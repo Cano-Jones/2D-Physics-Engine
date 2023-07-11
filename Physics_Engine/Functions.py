@@ -83,23 +83,47 @@ def Particle_Line_Distance(particle, line):
 def Particle_Particle_Collision(p1,p2):
     #https://physics.stackexchange.com/questions/599278/how-can-i-calculate-the-final-velocities-of-two-spheres-after-an-elastic-collisi
     
-    vec=p1.Position-p2.Position
-    vec_norm=norm(vec)
+    if p1.Dynamic and p2.Dynamic:
     
-    if vec_norm!=0:
-        n=vec/vec_norm
-        Delta=(p1.Radius+p2.Radius-vec_norm)
-        p1.Position=p1.Position + n*Delta*(p2.Mass/(p1.Mass+p2.Mass))
-        p2.Position=p2.Position - n*Delta*(p1.Mass/(p1.Mass+p2.Mass))
-        
         vec=p1.Position-p2.Position
-        vec=vec/norm(vec)
-        aux=0
-        for d in range(2): aux+=vec[d]*(p2.Velocity[d]-p1.Velocity[d])
-        c=2.0*aux/((vec[0]**2+vec[1]**2)*(1.0/p1.Mass+1.0/p2.Mass))
+        vec_norm=norm(vec)
         
-        p1.Velocity=p1.Velocity + vec*c/p1.Mass
-        p2.Velocity=p2.Velocity - vec*c/p2.Mass
+        if vec_norm!=0:
+            n=vec/vec_norm
+            Delta=(p1.Radius+p2.Radius-vec_norm)
+            p1.Position=p1.Position + n*Delta*(p2.Mass/(p1.Mass+p2.Mass))
+            p2.Position=p2.Position - n*Delta*(p1.Mass/(p1.Mass+p2.Mass))
+            
+            vec=p1.Position-p2.Position
+            vec=vec/norm(vec)
+            aux=0
+            for d in range(2): aux+=vec[d]*(p2.Velocity[d]-p1.Velocity[d])
+            c=2.0*aux/((vec[0]**2+vec[1]**2)*(1.0/p1.Mass+1.0/p2.Mass))
+            
+            p1.Velocity=p1.Velocity + vec*c/p1.Mass
+            p2.Velocity=p2.Velocity - vec*c/p2.Mass
+            
+    elif p1.Dynamic:
+        vec=p1.Position-p2.Position
+        vec_norm=norm(vec)
+        
+        if vec_norm!=0:
+            p1.Position = p2.Position + (vec/vec_norm)*(p1.Radius+p2.Radius)
+            Angle = atan2(vec[1], vec[0]) + pi/2
+            [Vx, Vy]= p1.Velocity
+            p1.Velocity[0]=cos(2*Angle)*Vx+Vy*sin(2*Angle)
+            p1.Velocity[1]=sin(2*Angle)*Vx-Vy*cos(2*Angle)
+
+    else: 
+        vec=p1.Position-p2.Position
+        vec_norm=norm(vec)
+        
+        if vec_norm!=0:
+            p2.Position = p1.Position - (vec/vec_norm)*(p1.Radius+p2.Radius)
+            Angle = atan2(vec[1], vec[0]) - pi/2
+            [Vx, Vy]= p2.Velocity
+            p2.Velocity[0]=cos(2*Angle)*Vx+Vy*sin(2*Angle)
+            p2.Velocity[1]=sin(2*Angle)*Vx-Vy*cos(2*Angle)
 
 
 def Particle_Line_Collision(particle, line):

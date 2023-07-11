@@ -6,7 +6,7 @@ from math import atan2
 class Particle():
     
     def __init__(self, Position: list = [0,0], Velocity: list = [0,0], Mass: float = 10, Radius: float = 10,
-                 Charge: float = 1, Color: str = 'black'):
+                 Charge: float = 1, Color: str = 'black', Dynamic: bool = True):
         
         self.Position = array(Position)
         self.Velocity = array(Velocity)
@@ -16,14 +16,17 @@ class Particle():
         self.Color = Color
         self.Force = lambda self: [0,0]
         self.Boundary = lambda self: None 
+        self.Dynamic = Dynamic
     
     def Move(self, TimeStep: float = 0.1):
         
-        self.Velocity=self.Velocity+0.5*array(self.Force(self))/self.Mass*TimeStep
-        self.Position=self.Position+self.Velocity*TimeStep
-        self.Velocity=self.Velocity+0.5*array(self.Force(self))/self.Mass*TimeStep
+        if self.Dynamic:
         
-        self.Boundary(self)
+            self.Velocity=self.Velocity+0.5*array(self.Force(self))/self.Mass*TimeStep
+            self.Position=self.Position+self.Velocity*TimeStep
+            self.Velocity=self.Velocity+0.5*array(self.Force(self))/self.Mass*TimeStep
+            
+            self.Boundary(self)
 
 class Line():
     def __init__(self, Point_A: list = [0,0], Point_B: list = [0,0]):
