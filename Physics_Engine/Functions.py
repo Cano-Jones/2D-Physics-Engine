@@ -1,14 +1,30 @@
+"""
+
+
+Author: Cano Jones, Alejandro
+linkedin: www.linkedin.com/in/alejandro-cano-jones-5b20a7136
+github: https://github.com/Cano-Jones
+"""
+
+########################################################################
+
+#Libraries
+
 from numpy import array, remainder, dot, sign
 from numpy.linalg import norm
-from math import sqrt, atan2, cos, sin, pi
+from math import atan2, cos, sin, pi
 from pygame import draw, display, time, event, QUIT
 from sys import exit
 from itertools import combinations
 from numpy import random
-from time import sleep
+
+########################################################################
+
+#Functions
 
 
-def Closed_Box_Boundary(particle,):
+
+def Closed_Box_Boundary(particle):
     
     if particle.Position[0] > (BoxSize[0]-particle.Radius):
         particle.Position[0] = (BoxSize[0]-particle.Radius)
@@ -174,7 +190,7 @@ def Pygame_Start(WindowSize):
 
 
 def Engine(Window_Size: list = [600,600], Particle_System: list = [], Line_System: list = [],
-           Background: 'function' = Dummy_Function, Boundary: 'function' = lambda self: None, Force: 'function' = lambda self: [0,0]):
+           Background: 'function' = Dummy_Function, Boundary: 'function' = Closed_Box_Boundary, Force: 'function' = lambda self: [0,0]):
     
     
     Pygame_Start(Window_Size)
@@ -195,7 +211,6 @@ def Engine(Window_Size: list = [600,600], Particle_System: list = [], Line_Syste
                 Particle_Particle_Collision(comb[0], comb[1])
         for particle in Particle_System:
             for line in Line_System:
-                #print(Particle_Line_Distance(particle=particle, line=line))
                 if Particle_Line_Distance(particle=particle, line=line) < particle.Radius:
                     Particle_Line_Collision(particle=particle, line=line)
         dt = clock.tick(100)/1000
@@ -214,6 +229,8 @@ def Draw_Window(Particle_System: list =[], Line_System: list = [], Background: '
     
     
     
-def Random_Color():     return tuple(random.random(size=3) * 256)
+def Random_Color():     
+    return tuple(random.random(size=3) * 256)
 
-__all__ = ['Engine', 'Closed_Box_Boundary', 'Periodic_Boundary', 'Closed_Circle_Boundary', 'Circle_Boundary_Background', 'Particle_Particle_Distance', 'Random_Color']
+__all__ = ['Engine', 'Closed_Box_Boundary', 'Periodic_Boundary', 'Closed_Circle_Boundary',
+           'Circle_Boundary_Background', 'Particle_Particle_Distance', 'Random_Color']
