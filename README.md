@@ -1,4 +1,6 @@
-# 2D-Physics-Engine
+<p align="center">
+  <img src="Example_Scripts/Images/Banner.gif" />
+</p>
 
 <!-- START OF LICENSE -->
 <p xmlns:dct="http://purl.org/dc/terms/" xmlns:cc="http://creativecommons.org/ns#" class="license-text">
