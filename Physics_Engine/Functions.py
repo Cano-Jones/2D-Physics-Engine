@@ -130,7 +130,7 @@ def Particle_Particle_Collision(p1,p2):
             p1.Velocity[0]=cos(2*Angle)*Vx+Vy*sin(2*Angle)
             p1.Velocity[1]=sin(2*Angle)*Vx-Vy*cos(2*Angle)
 
-    else: 
+    elif p2.Dynamic: 
         vec=p1.Position-p2.Position
         vec_norm=norm(vec)
         
@@ -170,7 +170,9 @@ def Particle_Line_Collision(particle, line):
         particle.Velocity=array([Vx,Vy])
         
 
-
+def Const_Gravity(g: float = 250):
+    
+    return lambda x: [0, g*x.Mass]
 
 
 
@@ -179,9 +181,7 @@ def Dummy_Function(): pass
 
 
 def Pygame_Start(WindowSize):
-    global BoxSize
-    global screen
-    global clock
+    global BoxSize, screen, clock
     BoxSize=WindowSize
     screen=display.set_mode(WindowSize)
     display.set_caption('2D Physics Engine')
@@ -194,25 +194,32 @@ def Engine(Window_Size: list = [600,600], Particle_System: list = [], Line_Syste
     
     
     Pygame_Start(Window_Size)
+    
     for particle in Particle_System:
         particle.Boundary=Boundary
         particle.Force=Force
         
     dt=0.1
     while True:
+        
         for py_event in event.get():
             if py_event.type == QUIT:
                 exit()
+                
         Draw_Window(Particle_System=Particle_System, Background=Background, Line_System=Line_System)
+        
         for particle in Particle_System:
             particle.Move(dt)
+            
         for comb in combinations(Particle_System,2):
             if Particle_Particle_Distance(comb[0], comb[1]) < comb[0].Radius+comb[1].Radius:
                 Particle_Particle_Collision(comb[0], comb[1])
+                
         for particle in Particle_System:
             for line in Line_System:
                 if Particle_Line_Distance(particle=particle, line=line) < particle.Radius:
                     Particle_Line_Collision(particle=particle, line=line)
+                    
         dt = clock.tick(100)/1000
 
 
@@ -233,4 +240,4 @@ def Random_Color():
     return tuple(random.random(size=3) * 256)
 
 __all__ = ['Engine', 'Closed_Box_Boundary', 'Periodic_Boundary', 'Closed_Circle_Boundary',
-           'Circle_Boundary_Background', 'Particle_Particle_Distance', 'Random_Color']
+           'Circle_Boundary_Background', 'Particle_Particle_Distance', 'Random_Color', 'Const_Gravity']
