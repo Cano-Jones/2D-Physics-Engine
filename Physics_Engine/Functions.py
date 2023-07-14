@@ -417,4 +417,5 @@ def Random_Color():
     return tuple(random.random(size=3) * 255)
 
 __all__ = ['Engine', 'Closed_Box_Boundary', 'Periodic_Boundary', 'Closed_Circle_Boundary',
-           'Circle_Boundary_Background', 'Particle_Particle_Distance', 'Random_Color', 'Const_Gravity']
+           'Circle_Boundary_Background', 'Particle_Particle_Distance', 'Random_Color', 
+           'Particle_Line_Distance', 'Const_Gravity']
