@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Example_Scripts/Images/Banner.gif" />
+  <img src="Banner.gif" />
 </p>
 
 <!-- START OF LICENSE -->
