@@ -2,10 +2,6 @@
   <img src="Example_Scripts/Images/Banner.gif" />
 </p>
 
-<p align="center">
-  <img src="Example_Scripts/Images/Pachinko.gif" />
-</p>
-
 <!-- START OF LICENSE -->
 <p xmlns:dct="http://purl.org/dc/terms/" xmlns:cc="http://creativecommons.org/ns#" class="license-text">
   <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">
