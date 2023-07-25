@@ -54,11 +54,11 @@ The library includes some predefined functions that could be used to describe th
 
 ##
 This python library allows multiple aplications, including physics simulations with real educational value, a great example might be the simulation presented bellow, with two gases separated by a chamber, blue particles have greater average velocity than red particles. This could be used to demonstrate principles in thermodinamics and statistical physics
-<p align="center">
+<div align="center">
   <figure align="center">
   <img src="Example_Scripts/Images/TwoGases.gif" width="400">
 </figure>
-</p>
+</div>
 
 
 
