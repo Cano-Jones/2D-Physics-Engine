@@ -1,0 +1,5 @@
+itertools
+math
+numpy
+pygame
+sys

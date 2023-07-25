@@ -1,0 +1,21 @@
+Metadata-Version: 2.1
+Name: Physics-Engine
+Version: 0.0.0
+Summary: Library amied to the creation of simple yet realistic simulations of collisions between particles and line segments.
+Home-page: UNKNOWN
+Author: Cano Jones, Alejandro
+Author-email: canojones.alejandro@gmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3.0
+Classifier: Development Status :: 3 - Alpha
+Classifier: Natural Language :: English
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Topic :: Education
+Classifier: Topic :: Games/Entertainment :: Simulation
+Classifier: Topic :: Scientific/Engineering :: Physics
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+License-File: LICENSE.md
+
+UNKNOWN
+
