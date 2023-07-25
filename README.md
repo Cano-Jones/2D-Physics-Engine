@@ -57,6 +57,7 @@ This python library allows multiple aplications, including physics simulations w
 <div align="center">
   <figure align="center">
   <img src="Example_Scripts/Images/TwoGases.gif" width="400">
+  <figcaption style="color: grey">Two gases</figcaption>
 </figure>
 </div>
 
