@@ -10,7 +10,7 @@ Physics_Engine is a python library that allows users to create simple yet realis
 This library provides two main object classes: 'Particle' and 'Line'. Given a set of particles and line segments the main 'Engine' function creates a real-time simulation and graphic animation of the interaction between particles and lines.
 
 Particles will bounce off other particles, lines or boundaries according to newtonian mechanics, preserving energy thanks to the implementation of a Verlet algorithm used to move the particles.
-<p align="center">
+<div align="center">
 <table><tr>
 <td> 
   <p align="center" style="padding: 30px">
@@ -27,7 +27,7 @@ Particles will bounce off other particles, lines or boundaries according to newt
   </p> 
 </td>
 </tr></table>
-</p>
+</div>
 In order to create a particle 'p' one must procede to inicializate as follows
 ```
 p = Particle(Position, Velocity, Mass, Radius, Color, Dynamic)
