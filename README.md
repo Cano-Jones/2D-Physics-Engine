@@ -29,13 +29,13 @@ Particles will bounce off other particles, lines or boundaries according to newt
 </tr></table>
 </div>
 In order to create a particle 'p' one must procede to inicializate as follows
-```
-p = Particle(Position, Velocity, Mass, Radius, Color, Dynamic)
-```
+
+`p = Particle(Position, Velocity, Mass, Radius, Color, Dynamic)`
+
 In order to create a line segment 'l' one must procede to inicializate as follows
-```
-l = Line(Point_A, Point_B)
-```
+
+`l = Line(Point_A, Point_B)`
+
 
 The environment in which the objects exist must be determined by the user, this includes:
 
